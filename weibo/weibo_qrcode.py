@@ -58,6 +58,8 @@ def wait_scan(qrcode_qrid):
         if "50114002" in qrcode_check_page:
             scaned = True
             print('扫描成功，请点击确认登录')
+        else:
+            print('没有确认扫描')
         time.sleep(2)
 
 def wait_confirm(qrcode_qrid):
@@ -89,7 +91,14 @@ def get_qrcode():
     qrcode_image = re.search(r'"image":"(?P<image>.*?)"', qrcode_text).group("image").replace("\/", "/")
     if not qrcode_image.startswith('http:'):
         qrcode_image = 'http:' + qrcode_image
-    qrcode_qrid = re.search(r'"qrid":"(?P<qrid>[\w\-]*)"', qrcode_text).group("qrid")
+
+    #qrcode_qrid = re.search(r'"qrid":"(?P<qrid>[\w\-]*)"', qrcode_text)
+    qrcode_qrid = re.search(r'"qrid":"(?P<qrid>.*?)"', qrcode_text)
+    if qrcode_qrid:
+        qrcode_qrid = qrcode_qrid.group("qrid")
+    else:
+        print("qrcode_grid is null")
+
     qr_page = session.get(qrcode_image)
     image_name = "qr_login." + qr_page.headers['content-type'].split("/")[1]
     with open(image_name, 'wb') as f:
